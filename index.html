@@ -1,63 +1,62 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <!-- Google Font-->
-  <link rel = "preconnect" href="https://fonts.googleapis.com">
-  <link rel = "preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800&display=swap", rel="stylesheet">
-  <!-- end of googel font-->
-  <link rel="stylesheet" href="style.css"
-  <!-- Header section-->
-    <header>
-      <h1>2024 US Presidential Election</h1>
-      <p>This analysis dives into the polling and textual data leading up to the 2024 U.S Election</p>
-    </header>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2024 US Presidential Election</title>
 
-    <!--Tabs-->
-    <div class="tab">
-      <button class="tablinks" onclick="tabFunction(event, 'Approval Ratings')">Approval Ratings</button>
-      <button class="tablinks" onclick="tabFunction(event, 'May 2024 Polls')">May 2024 Polls</button>
-      <button class="tablinks" onclick="tabFunction(event, 'Donald Trumps Assassination Attempt')">Donald Trump's Assassination Attempt</button>
-      <button class="tablinks" onclick="tabFunction(event, 'Presidential Debate')">Presidential Debate</button>
-      <button class="tablinks" onclick="tabFunction(event, 'September/October 2024 Polls')">September/October 2024 Polls</button>
-    </div>
-    
-    <!--Tab contents-->
-    <div id="Approval Ratings" class="tabcontent">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800&display=swap" rel="stylesheet">
 
-
-
-    </div>
-
-    <div id="May 2024 Polls" class="tabcontent">
-
-
-      
-    </div>
-
-    <div id="Donald Trumps Assassination Attempt" class="tabcontent">
-
-
-      
-    </div>
-
-    <div id="Presidential Debate" class="tabcontent">
-
-
-      
-    </div>
-
-    <div id="September/October 2024 Polls" class="tabcontent">
-
-
-      
-    </div>
-
-
-
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <!-- Header Section -->
+  <header>
+    <h1>2024 US Presidential Election</h1>
+    <p>This analysis dives into the polling and textual data leading up to the 2024 U.S Election</p>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tab">
+    <button class="tablinks" onclick="tabFunction(event, 'Approval Ratings')">Approval Ratings</button>
+    <button class="tablinks" onclick="tabFunction(event, 'May 2024 Polls')">May 2024 Polls</button>
+    <button class="tablinks" onclick="tabFunction(event, 'Donald Trumps Assassination Attempt')">Donald Trump's Assassination Attempt</button>
+    <button class="tablinks" onclick="tabFunction(event, 'Presidential Debate')">Presidential Debate</button>
+    <button class="tablinks" onclick="tabFunction(event, 'September/October 2024 Polls')">September/October 2024 Polls</button>
+  </div>
+
+  <!-- Tab Contents -->
+  <div id="Approval Ratings" class="tabcontent">
+    <!-- Add content here -->
+  </div>
+
+  <div id="May 2024 Polls" class="tabcontent">
+    <!-- Add content here -->
+  </div>
+
+  <div id="Donald Trumps Assassination Attempt" class="tabcontent">
+    <!-- Add content here -->
+  </div>
+
+  <div id="Presidential Debate" class="tabcontent">
+    <!-- Add content here -->
+  </div>
+
+  <div id="September/October 2024 Polls" class="tabcontent">
+    <!-- Add content here -->
+  </div>
+
+  <!-- JavaScript -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
+
+<!-- <body>
 <div id="container" class = "us2024">
 <div id="menuContainer">
   <div id="menuInnerDiv">
@@ -89,7 +88,7 @@
       <div class="menuDiv">
         <a class="menuTitle">Presidential Debate</a>
       </div>
-      <div class="menuDiv">
+      <div class="menuDiv rightCorner">
         <a class="menuTitle">September/October 2024 Polls</a>
       </div>
         
@@ -111,4 +110,4 @@
 
 
 
-</body>
+</body> 
