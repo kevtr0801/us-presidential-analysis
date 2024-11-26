@@ -1,76 +1,106 @@
-/* General body styling */
+/* General Styling */
 body {
-    margin: 0; /* Removes the browser's default margin around the body */
-    padding: 0; /* Removes the browser's default padding around the body */
-    font-family: 'Nunito Sans', sans-serif; /* Sets the font style for the entire page */
-    background-color: #f4f4f4; /* Sets a light gray background color for the page */
-    display: flex; /* Makes the body a flex container for easier alignment of child elements */
-    flex-direction: column; /* Stacks child elements (like the header and main content) vertically */
-    align-items: center; /* Centers all child elements horizontally */
+  font-family: 'Nunito Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
 }
 
-/* Header styling */
 header {
-    text-align: center; /* Centers the text inside the header horizontally */
-    padding: 20px; /* Adds 20px of space inside the header for better spacing */
-    width: 100%; /* Makes the header span the full width of the page */
-    background-color: #007bff; /* Sets the header's background color to a bright blue */
-    color: white; /* Makes the header text color white for contrast */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow below the header for a modern look */
+  text-align: center;
+  background-color: #007bff;
+  color: white;
+  padding: 20px;
 }
 
-/* Header main title (h1) styling */
-header h1 {
-    margin: 0; /* Removes the default margin around the h1 element */
-    font-size: 2rem; /* Sets the font size of the main title to 2 rem (relative to the root element) */
+.tab {
+  display: flex; /* Use flexbox for layout */
+  justify-content: center; /* Center the tabs horizontally */
+  border: 1px solid #ccc; /* Add border for style */
+  background-color: #f1f1f1; /* Background color of the tab bar */
+  margin-top: 10px; /* Add spacing between the header and tabs */
+  padding: 5px 0; /* Add padding inside the tab bar */
 }
 
-/* Header subtitle (p) styling */
-header p {
-    margin: 0; /* Removes the default margin around the paragraph element */
-    font-size: 1rem; /* Sets the font size of the subtitle to 1 rem (smaller than the h1) */
-    font-weight: 300; /* Applies a lighter font weight to the subtitle for a softer appearance */
+.tab button {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
-/* Optional: Sticky top position for the header */
-header {
-    position: sticky; /* Makes the header stick to the top of the page when scrolling */
-    top: 0; /* Specifies that the sticky header should remain at the very top of the page */
-    z-index: 1000; /* Ensures the header stays on top of other elements if they overlap */
+.tab button:hover {
+  background-color: #ddd;
 }
 
- /* Style the tab */
- .tab {
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
-  }
-  
-  /* Style the buttons that are used to open the tab content */
-  .tab button {
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-  }
-  
-  /* Change background color of buttons on hover */
-  .tab button:hover {
-    background-color: #ddd;
-  }
-  
-  /* Create an active/current tablink class */
-  .tab button.active {
-    background-color: #ccc;
-  }
-  
-  /* Style the tab content */
-  .tabcontent {
-    display: none;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-top: none;
-  } 
+.tab button.active {
+  background-color: #ccc;
+}
+
+.tabcontent {
+  display: none;
+  padding: 20px;
+}
+
+.tabcontent.active {
+  display: block;
+}
+
+/* Dropdown Hover Styling */
+.tab-item {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  width: 300px;
+}
+
+.dropdown-content h3 {
+  margin: 0 0 10px;
+}
+
+.dropdown-content form {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.dropdown-content button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-content button:hover {
+  background-color: #0056b3;
+}
+
+.tab-item:hover .dropdown-content {
+  display: block;
+}
+
+
+.grid line {
+  stroke: #e0e0e0; /* Light gray color */
+  stroke-width: 1;
+  stroke-dasharray: 3 3; /* Dashed gridlines */
+}
+
+.grid path {
+  stroke: none; /* Hide axis line */
+}
