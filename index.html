@@ -22,22 +22,19 @@
 
   <!-- Tabs -->
   <div class="tab">
-    <div class="tab-item">
-      <button class="tablinks" onclick="tabFunction(event, 'approval-ratings')">Approval Ratings</button>
-      <!-- Dropdown for filters -->
-      <div class="dropdown-content" id="filter-dropdown">
-        <h3>Filter Candidates</h3>
-        <form id="filter-form">
-          <!-- Dynamically populated filters -->
-        </form>
-        <button id="apply-filter">Apply Filter</button>
-      </div>
+    <div class="tab-item" id="approval-tab">
+        <button class="tablinks" onclick="tabFunction(event, 'approval-ratings')">Approval Ratings</button>
+        <div id="filter-dropdown" class="filter-box">
+            <h3>Filter Candidates</h3>
+            <form id="filter-form"></form>
+        </div>
     </div>
     <button class="tablinks" onclick="tabFunction(event, 'May 2024 Polls')">May 2024 Polls</button>
     <button class="tablinks" onclick="tabFunction(event, 'Donald Trumps Assassination Attempt')">Donald Trump's Assassination Attempt</button>
     <button class="tablinks" onclick="tabFunction(event, 'Presidential Debate')">Presidential Debate</button>
     <button class="tablinks" onclick="tabFunction(event, 'September/October 2024 Polls')">September/October 2024 Polls</button>
-  </div>
+</div>
+
 
   <!-- Tab Content -->
   <div id="approval-ratings" class="tabcontent">
