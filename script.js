@@ -1,81 +1,165 @@
 // Function to render a plot for a single candidate
 function renderPlot(data, institution, gridContainer) {
+    // Filter data for the selected institution
     const candidateData = data.filter(d => d.institution === institution);
+
+    // Group data by response category (e.g., Approve, Disapprove)
     const groupedData = d3.group(candidateData, d => d.answer);
 
+    // Create a container for the plot
     const container = d3.select(gridContainer)
-        .append("div")
-        .attr("class", "candidate-plot")
-        .style("border", "1px solid #ccc")
-        .style("padding", "10px")
-        .style("border-radius", "5px")
-        .style("background-color", "#fff");
+        .append("div") // Each candidate gets its own div
+        .attr("class", "candidate-plot") // Apply candidate-plot styling
+        .style("border", "1px solid #ccc") // Add a border
+        .style("padding", "10px") // Add padding
+        .style("border-radius", "5px") // Rounded corners
+        .style("background-color", "#fff"); // Light background for contrast
 
+    // Add a title (candidate/institution name)
     container.append("h3")
-        .style("text-align", "center")
-        .text(institution);
+        .style("text-align", "center") // Center-align the title
+        .text(institution); // Use the institution name
 
-    const margin = { top: 70, right: 30, bottom: 40, left: 80 };
-    const width = 500 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    // Set up dimensions and margins for the chart
+    const margin = { top: 50, right: 20, bottom: 50, left: 50 };
+    const width = 400 - margin.left - margin.right;
+    const height = 300 - margin.top - margin.bottom;
 
+    // Create an SVG element for the plot
+    const svg = container.append("svg")
+        .attr("width", width + margin.left + margin.right) // Include margins in width
+        .attr("height", height + margin.top + margin.bottom) // Include margins in height
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`); // Move to account for margins
+
+    // Create scales for the X (time) and Y (percentage) axes
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
 
-    const color = d3.scaleOrdinal()
-        .domain(["Approve", "Disapprove"])
-        .range(["#4CAF50", "#E91E63"]);
+    // Set the domains (input values) for the scales based on data
+    x.domain(d3.extent(candidateData, d => d.date)); // Use the date range for X
+    y.domain([0, d3.max(candidateData, d => d.hi)]); // Use the maximum confidence interval for Y
 
-    const svg = container
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    x.domain(d3.extent(candidateData, d => d.date));
-    y.domain([0, d3.max(candidateData, d => d.hi)]);
-
-    // Add x-axis
+    // Add the X-axis
     svg.append("g")
-        .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x).ticks(d3.timeMonth.every(3)).tickFormat(d3.timeFormat("%b %Y")))
-        .selectAll("text")
-        .attr("transform", "rotate(-45)")
-        .style("text-anchor", "end");
+        .attr("transform", `translate(0,${height})`) // Position at the bottom
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b %Y"))) // Format ticks as "Month Year"
+        .selectAll("text") // Select tick labels
+        .attr("transform", "rotate(-45)") // Rotate labels for better fit
+        .style("text-anchor", "end"); // Align text to the end of ticks
 
-    // Add y-axis
-    svg.append("g").call(d3.axisLeft(y));
+    // Add the Y-axis
+    svg.append("g")
+        .call(d3.axisLeft(y)); // Add the Y-axis on the left
 
-    // Add confidence intervals and lines
+    // Add gridlines for better readability
+    svg.append("g")
+        .attr("class", "grid") // Use CSS for grid styling
+        .attr("transform", `translate(0,${height})`) // Position at the bottom
+        .call(d3.axisBottom(x).tickSize(-height).tickFormat("")) // Horizontal gridlines
+        .selectAll(".tick line")
+        .attr("stroke", "#e0e0e0"); // Light gray lines
+
+    svg.append("g")
+        .attr("class", "grid") // Use CSS for grid styling
+        .call(d3.axisLeft(y).tickSize(-width).tickFormat("")) // Vertical gridlines
+        .selectAll(".tick line")
+        .attr("stroke", "#e0e0e0"); // Light gray lines
+
+    // Add confidence intervals (shaded areas) and trend lines for each category
     groupedData.forEach((values, key) => {
+        // Add the confidence interval
         svg.append("path")
-            .datum(values)
-            .attr("fill", color(key))
-            .attr("opacity", 0.2)
+            .datum(values) // Bind the data
+            .attr("fill", key === "Approve" ? "#4CAF50" : "#E91E63") // Color by category
+            .attr("opacity", 0.2) // Slightly transparent
             .attr("d", d3.area()
-                .x(d => x(d.date))
-                .y0(d => y(d.lo))
-                .y1(d => y(d.hi))
+                .x(d => x(d.date)) // X is the date
+                .y0(d => y(d.lo)) // Y0 is the lower bound
+                .y1(d => y(d.hi)) // Y1 is the upper bound
             );
 
+        // Add the trend line
         svg.append("path")
-            .datum(values)
-            .attr("fill", "none")
-            .attr("stroke", color(key))
-            .attr("stroke-width", 2.5)
+            .datum(values) // Bind the data
+            .attr("fill", "none") // No fill for the line
+            .attr("stroke", key === "Approve" ? "#4CAF50" : "#E91E63") // Color by category
+            .attr("stroke-width", 2) // Line thickness
             .attr("d", d3.line()
-                .x(d => x(d.date))
-                .y(d => y(d.pct_estimate))
+                .x(d => x(d.date)) // X is the date
+                .y(d => y(d.pct_estimate)) // Y is the percentage estimate
             );
     });
+
+    // Add a vertical line for the crosshair effect
+    const verticalLine = svg.append("line")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("y1", 0)
+        .attr("y2", height)
+        .attr("opacity", 0); // Initially hidden
+
+    // Tooltip for showing data details
+    const tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("background", "#fff")
+        .style("border", "1px solid #ccc")
+        .style("padding", "10px")
+        .style("border-radius", "5px")
+        .style("font-size", "12px")
+        .style("display", "none") // Hidden by default
+        .style("pointer-events", "none"); // Prevent interactions
+
+    // Add an invisible overlay for capturing mouse events
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", "none")
+        .attr("pointer-events", "all")
+        .on("mousemove", function (event) {
+            // Find the mouse position
+            const [mouseX] = d3.pointer(event);
+            const hoveredDate = x.invert(mouseX); // Convert to date
+
+            // Find the closest data points for each category
+            const closestPoints = [];
+            groupedData.forEach((values, key) => {
+                const closest = values.reduce((a, b) =>
+                    Math.abs(b.date - hoveredDate) < Math.abs(a.date - hoveredDate) ? b : a
+                );
+                closestPoints.push({ key, ...closest });
+            });
+
+            // Update the vertical line position
+            verticalLine
+                .attr("x1", mouseX)
+                .attr("x2", mouseX)
+                .attr("opacity", 1);
+
+            // Show and position the tooltip
+            tooltip.style("display", "block")
+                .html(closestPoints.map(p => `
+                    <strong>${p.key}</strong><br>
+                    Date: ${d3.timeFormat("%b %d, %Y")(p.date)}<br>
+                    Value: ${p.pct_estimate.toFixed(1)}%
+                `).join("<br><br>"))
+                .style("left", `${event.pageX + 15}px`)
+                .style("top", `${event.pageY - 30}px`);
+        })
+        .on("mouseout", () => {
+            // Hide the vertical line and tooltip
+            verticalLine.attr("opacity", 0);
+            tooltip.style("display", "none");
+        });
 }
 
-// Function to populate filter options
+// Populate filter options dynamically
 function populateFilterOptions(institutions, data) {
     const filterForm = document.getElementById("filter-form");
-    filterForm.innerHTML = "";
+    filterForm.innerHTML = ""; // Clear any existing options
 
+    // Create a checkbox for each institution
     institutions.forEach(institution => {
         const label = document.createElement("label");
         const checkbox = document.createElement("input");
@@ -83,9 +167,8 @@ function populateFilterOptions(institutions, data) {
         checkbox.value = institution;
         checkbox.name = "candidate-filter";
 
-        checkbox.addEventListener("change", () => {
-            applyFilter(data, institutions); // Apply filter whenever a checkbox is checked/unchecked
-        });
+        // Apply filter when the checkbox is toggled
+        checkbox.addEventListener("change", () => applyFilter(data, institutions));
 
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(institution));
@@ -93,61 +176,58 @@ function populateFilterOptions(institutions, data) {
     });
 }
 
-// Function to apply filters dynamically
+// Apply filters and update the grid layout
 function applyFilter(data, institutions) {
-    const selectedCandidates = Array.from(
+    const selected = Array.from(
         document.querySelectorAll("input[name='candidate-filter']:checked")
-    ).map(checkbox => checkbox.value);
+    ).map(checkbox => checkbox.value); // Get the selected candidates
 
-    const gridContainer = document.querySelector("#grid-container");
+    const gridContainer = document.getElementById("grid-container");
     gridContainer.innerHTML = ""; // Clear existing plots
 
-    if (selectedCandidates.length === 0) {
+    if (selected.length === 0) {
         // Default: 2x2 grid for all candidates
-        gridContainer.style.display = "grid";
-        gridContainer.style.gridTemplateColumns = "1fr 1fr";
-        institutions.forEach(institution => renderPlot(data, institution, gridContainer));
+        gridContainer.className = "grid-container two-columns";
+        institutions.forEach(inst => renderPlot(data, inst, gridContainer));
+    } else if (selected.length === 1) {
+        // Single column layout for one candidate
+        gridContainer.className = "grid-container single-column";
+        selected.forEach(candidate => renderPlot(data, candidate, gridContainer));
     } else {
-        const gridColumns = Math.min(selectedCandidates.length, 2); // Max 2 columns
-        gridContainer.style.display = "grid";
+        // Adjust grid based on the number of candidates selected
+        const gridColumns = Math.min(selected.length, 2); // Max 2 columns
+        gridContainer.className = `grid-container`;
         gridContainer.style.gridTemplateColumns = `repeat(${gridColumns}, 1fr)`;
-        selectedCandidates.forEach(candidate => renderPlot(data, candidate, gridContainer));
+        selected.forEach(candidate => renderPlot(data, candidate, gridContainer));
     }
 }
 
 // Tab switching function
 function tabFunction(event, tabName) {
     const tabContents = document.querySelectorAll(".tabcontent");
-    tabContents.forEach(content => content.style.display = "none");
+    tabContents.forEach(content => content.style.display = "none"); // Hide all tabs
 
     const tabLinks = document.querySelectorAll(".tablinks");
-    tabLinks.forEach(tab => tab.classList.remove("active"));
+    tabLinks.forEach(tab => tab.classList.remove("active")); // Remove active styling
 
-    document.getElementById(tabName).style.display = "block";
-    event.currentTarget.classList.add("active");
-
-    const filterDropdown = document.getElementById("filter-dropdown");
-    if (tabName === "approval-ratings") {
-        filterDropdown.style.display = "block"; // Show filter dropdown
-    } else {
-        filterDropdown.style.display = "none"; // Hide filter dropdown
-    }
+    document.getElementById(tabName).style.display = "block"; // Show the selected tab
+    event.currentTarget.classList.add("active"); // Mark the clicked tab as active
 }
 
-// On page load
+// Initialize on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
+    // Load the dataset and preprocess it
     d3.csv("datasets/approval_averages.csv", d => ({
-        institution: d['politician/institution'],
+        institution: d["politician/institution"],
         date: d3.timeParse("%Y-%m-%d")(d.date),
         answer: d.answer,
         pct_estimate: +d.pct_estimate,
         lo: +d.lo,
         hi: +d.hi
     })).then(data => {
-        const institutions = Array.from(new Set(data.map(d => d.institution)));
-        populateFilterOptions(institutions, data);
-        applyFilter(data, institutions);
-
-        document.querySelector(".tablinks").click(); // Simulate a click on the first tab
+        const institutions = [...new Set(data.map(d => d.institution))]; // Get unique institutions
+        populateFilterOptions(institutions, data); // Populate filter options
+        applyFilter(data, institutions); // Render default plots
+        document.querySelector(".tablinks").click(); // Simulate click on the first tab
     });
 });
