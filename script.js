@@ -1,5 +1,4 @@
-// Function to render a plot for a single candidate
-function renderPlot(data, institution, gridContainer) {
+function renderApprovalPlot(data, institution, gridContainer) {
     // Filter data for the selected institution
     const candidateData = data.filter(d => d.institution === institution);
 
@@ -21,9 +20,9 @@ function renderPlot(data, institution, gridContainer) {
         .text(institution); // Use the institution name
 
     // Set up dimensions and margins for the chart
-    const margin = { top: 50, right: 20, bottom: 50, left: 50 };
-    const width = 400 - margin.left - margin.right;
-    const height = 300 - margin.top - margin.bottom;
+    const margin = { top: 1, right: 20, bottom: 50, left: 40 };
+    const width = 800 - margin.left - margin.right; // Increase the width
+    const height = 500 - margin.top - margin.bottom; // Increase the height
 
     // Create an SVG element for the plot
     const svg = container.append("svg")
@@ -42,15 +41,33 @@ function renderPlot(data, institution, gridContainer) {
 
     // Add the X-axis
     svg.append("g")
-        .attr("transform", `translate(0,${height})`) // Position at the bottom
-        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b %Y"))) // Format ticks as "Month Year"
-        .selectAll("text") // Select tick labels
-        .attr("transform", "rotate(-45)") // Rotate labels for better fit
-        .style("text-anchor", "end"); // Align text to the end of ticks
+    .attr("transform", `translate(0,${height})`) // Position X-axis at the bottom
+    .call(
+        d3.axisBottom(x)
+            .ticks(d3.timeMonth.every(6)) // Tick every 6 months
+            .tickSizeInner(0) // Remove inner ticks
+            .tickSizeOuter(0) // Remove ticks extending beyond the axis
+            .tickFormat((d, i) => (i === 0 ? "" : d3.timeFormat("%b %Y")(d))) // Skip the first label
+    )
+    .selectAll("text") // Select all tick labels
+    .style("font-size", "14px"); // Adjust the font size
 
     // Add the Y-axis
+    const globalMinY = 0; // Set to 0 for a consistent baseline
+    const globalMaxY = d3.max(data, d => d.hi); // Find the max "hi" value across all data
+    
+    // Set the Y-axis domain to the global min and max
+    y.domain([globalMinY, globalMaxY]);
     svg.append("g")
-        .call(d3.axisLeft(y)); // Add the Y-axis on the left
+    .call(
+        d3.axisLeft(y)
+            .ticks(6) // Number of ticks
+            .tickSizeInner(0) // Remove inner ticks extending into the chart area
+            .tickSizeOuter(0) // Remove ticks extending beyond the axis
+            .tickFormat(d3.format(".0f")) // Format labels as integers
+    )
+    .selectAll("text") // Select all tick labels
+    .style("font-size", "14px"); // Adjust the font size
 
     // Add gridlines 
     svg.append("g")
@@ -88,7 +105,7 @@ function renderPlot(data, institution, gridContainer) {
             .datum(values) // Bind the data
             .attr("fill", "none") // No fill for the line
             .attr("stroke", key === "Approve" ? "#4CAF50" : "#E91E63") // Color by category
-            .attr("stroke-width", 2) // Line thickness
+            .attr("stroke-width", 3) // Line thickness
             .attr("d", d3.line()
                 .x(d => x(d.date)) // X is the date
                 .y(d => y(d.pct_estimate)) // Y is the percentage estimate
@@ -197,7 +214,7 @@ function applyFilter(data, institutions) {
             plotContainer.className = "candidate-plot fade-in"; // Add fade-in class
             gridContainer.appendChild(plotContainer);
 
-            renderPlot(data, inst, plotContainer);
+            renderApprovalPlot(data, inst, plotContainer);
         });
     } else if (selected.length === 1) {
         // Single column layout for one candidate
@@ -207,7 +224,7 @@ function applyFilter(data, institutions) {
             plotContainer.className = "candidate-plot fade-in"; // Add fade-in class
             gridContainer.appendChild(plotContainer);
 
-            renderPlot(data, candidate, plotContainer);
+            renderApprovalPlot(data, candidate, plotContainer);
         });
     } else {
         // Adjust grid based on the number of candidates selected
@@ -219,7 +236,7 @@ function applyFilter(data, institutions) {
             plotContainer.className = "candidate-plot fade-in"; // Add fade-in class
             gridContainer.appendChild(plotContainer);
 
-            renderPlot(data, candidate, plotContainer);
+            renderApprovalPlot(data, candidate, plotContainer);
         });
     }
 }
@@ -249,6 +266,7 @@ function tabFunction(event, tabName) {
 }
 
 // Initialize on DOMContentLoaded
+// Initialize on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
     // Load the dataset and preprocess it
     d3.csv("datasets/approval_averages.csv", d => ({
@@ -259,9 +277,17 @@ document.addEventListener("DOMContentLoaded", () => {
         lo: +d.lo,
         hi: +d.hi
     })).then(data => {
-        const institutions = [...new Set(data.map(d => d.institution))];
-        populateFilterOptions(institutions, data);
-        applyFilter(data, institutions);
+        // Filter the data to include only rows on or after July 1, 2021
+        const filteredData = data.filter(d => d.date >= new Date(2021, 6, 1)); // July is month 6 (zero-indexed)
+
+        // Extract unique institutions after filtering
+        const institutions = [...new Set(filteredData.map(d => d.institution))];
+
+        // Populate filter options and apply the filter
+        populateFilterOptions(institutions, filteredData);
+        applyFilter(filteredData, institutions);
+
+        // Trigger the default tab
         document.querySelector(".tablinks").click();
     });
 });

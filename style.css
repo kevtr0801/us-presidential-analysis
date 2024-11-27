@@ -89,25 +89,32 @@ header {
   display: block;
 }
 
-/* Candidate Plot Styling 
+/* Center and resize individual plots */
 .candidate-plot {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-  padding: 10px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-} */
+  width: 100%; /* Take full width of the grid cell */
+  max-width: 800px; /* Extend the box width */
+  height: auto; /* Let height adjust dynamically */
+  margin: 1px auto; /* Center each box and add spacing between them */
+  padding: 20px; /* Add internal space around the plot */
+}
 
+s
 .candidate-plot h3 {
   text-align: center;
   margin: 10px 0;
 }
 
+/* Grid container styling */
 .grid-container {
   display: grid;
-  gap: 20px;
+  gap: 1px; /* Reduce the space between boxes */
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Adjust column size */
+  max-width: 1600px; /* Keep the grid container width as is */
+  margin: 0 auto; /* Center the grid */
+  padding: 20px; /* Space inside the container */
 }
+
+
 
 .grid-container.two-columns {
   grid-template-columns: 1fr 1fr;
@@ -141,4 +148,7 @@ header {
     opacity: 1; /* Fully visible */
     transform: translateY(0); /* Reset position */
   }
+}
+.candidate-plot svg {
+  cursor: crosshair; /* Changes the mouse cursor to a crosshair */
 }
