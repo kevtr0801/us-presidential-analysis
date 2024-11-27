@@ -89,7 +89,7 @@ header {
   display: block;
 }
 
-/* Candidate Plot Styling */
+/* Candidate Plot Styling 
 .candidate-plot {
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -97,7 +97,7 @@ header {
   padding: 10px;
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
   margin: 10px;
-}
+} */
 
 .candidate-plot h3 {
   text-align: center;
@@ -115,4 +115,30 @@ header {
 
 .grid-container.dynamic-layout {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Initial hidden state */
+.tabcontent {
+  opacity: 0; /* Start fully transparent */
+  transition: opacity 0.5s ease-in-out; /* Smooth fade effect */
+}
+
+/* Fade-in effect when this class is added */
+.tabcontent.fade-in {
+  opacity: 1; /* Fully visible */
+}
+
+/* Fade-in animation class */
+.fade-in {
+  opacity: 0; /* Initial hidden state */
+  transform: translateY(20px); /* Slight downward shift */
+  animation: fadeIn 0.5s ease forwards; /* Animate to visible state */
+}
+
+/* Keyframes for fade-in effect */
+@keyframes fadeIn {
+  to {
+    opacity: 1; /* Fully visible */
+    transform: translateY(0); /* Reset position */
+  }
 }

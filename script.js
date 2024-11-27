@@ -52,19 +52,23 @@ function renderPlot(data, institution, gridContainer) {
     svg.append("g")
         .call(d3.axisLeft(y)); // Add the Y-axis on the left
 
-    // Add gridlines for better readability
+    // Add gridlines 
     svg.append("g")
         .attr("class", "grid") // Use CSS for grid styling
         .attr("transform", `translate(0,${height})`) // Position at the bottom
         .call(d3.axisBottom(x).tickSize(-height).tickFormat("")) // Horizontal gridlines
         .selectAll(".tick line")
-        .attr("stroke", "#e0e0e0"); // Light gray lines
+        .style("stroke", "gray")
+        .style("stroke-width", 0.5)
+        .style("stroke-dasharray", "3 3");
 
     svg.append("g")
         .attr("class", "grid") // Use CSS for grid styling
         .call(d3.axisLeft(y).tickSize(-width).tickFormat("")) // Vertical gridlines
         .selectAll(".tick line")
-        .attr("stroke", "#e0e0e0"); // Light gray lines
+        .style("stroke", "gray")
+        .style("stroke-width", 0.5)
+        .style("stroke-dasharray", "3 3");
 
     // Add confidence intervals (shaded areas) and trend lines for each category
     groupedData.forEach((values, key) => {
@@ -188,29 +192,59 @@ function applyFilter(data, institutions) {
     if (selected.length === 0) {
         // Default: 2x2 grid for all candidates
         gridContainer.className = "grid-container two-columns";
-        institutions.forEach(inst => renderPlot(data, inst, gridContainer));
+        institutions.forEach(inst => {
+            const plotContainer = document.createElement("div");
+            plotContainer.className = "candidate-plot fade-in"; // Add fade-in class
+            gridContainer.appendChild(plotContainer);
+
+            renderPlot(data, inst, plotContainer);
+        });
     } else if (selected.length === 1) {
         // Single column layout for one candidate
         gridContainer.className = "grid-container single-column";
-        selected.forEach(candidate => renderPlot(data, candidate, gridContainer));
+        selected.forEach(candidate => {
+            const plotContainer = document.createElement("div");
+            plotContainer.className = "candidate-plot fade-in"; // Add fade-in class
+            gridContainer.appendChild(plotContainer);
+
+            renderPlot(data, candidate, plotContainer);
+        });
     } else {
         // Adjust grid based on the number of candidates selected
-        const gridColumns = Math.min(selected.length, 2); // Max 2 columns
-        gridContainer.className = `grid-container`;
+        const gridColumns = Math.min(selected.length, 2);
+        gridContainer.className = "grid-container";
         gridContainer.style.gridTemplateColumns = `repeat(${gridColumns}, 1fr)`;
-        selected.forEach(candidate => renderPlot(data, candidate, gridContainer));
+        selected.forEach(candidate => {
+            const plotContainer = document.createElement("div");
+            plotContainer.className = "candidate-plot fade-in"; // Add fade-in class
+            gridContainer.appendChild(plotContainer);
+
+            renderPlot(data, candidate, plotContainer);
+        });
     }
 }
+
 
 // Tab switching function
 function tabFunction(event, tabName) {
     const tabContents = document.querySelectorAll(".tabcontent");
-    tabContents.forEach(content => content.style.display = "none"); // Hide all tabs
-
     const tabLinks = document.querySelectorAll(".tablinks");
-    tabLinks.forEach(tab => tab.classList.remove("active")); // Remove active styling
 
-    document.getElementById(tabName).style.display = "block"; // Show the selected tab
+    // Hide all tabs and reset fade-in classes
+    tabContents.forEach(content => {
+        content.style.display = "none"; // Hide all tabs
+        content.classList.remove("fade-in");
+    });
+
+    tabLinks.forEach(tab => tab.classList.remove("active")); // Deactivate all tabs
+
+    // Show and fade-in the selected tab
+    const selectedTab = document.getElementById(tabName);
+    selectedTab.style.display = "block"; // Make the tab visible
+    setTimeout(() => {
+        selectedTab.classList.add("fade-in");
+    }, 10);
+
     event.currentTarget.classList.add("active"); // Mark the clicked tab as active
 }
 
@@ -225,9 +259,9 @@ document.addEventListener("DOMContentLoaded", () => {
         lo: +d.lo,
         hi: +d.hi
     })).then(data => {
-        const institutions = [...new Set(data.map(d => d.institution))]; // Get unique institutions
-        populateFilterOptions(institutions, data); // Populate filter options
-        applyFilter(data, institutions); // Render default plots
-        document.querySelector(".tablinks").click(); // Simulate click on the first tab
+        const institutions = [...new Set(data.map(d => d.institution))];
+        populateFilterOptions(institutions, data);
+        applyFilter(data, institutions);
+        document.querySelector(".tablinks").click();
     });
 });
